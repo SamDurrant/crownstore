@@ -13,6 +13,36 @@ const config = {
   measurementId: process.env.REACT_APP_MEASUREMENTID
 };
 
+// will take in userAuth object returned from google
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+  if (!userAuth) return;
+
+  const userRef = firestore.doc(`users/${userAuth.uid}`);
+
+  // using snapshot, figure out whether or not we've already stored user object
+  const snapShot = await userRef.get();
+
+  // if  the snapshot doesn't exist, we try creating a new user reference
+  if (!snapShot.exists) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      await userRef.set({
+        displayName,
+        email,
+        createdAt,
+        ...additionalData
+      });
+    } catch (err) {
+      console.log('error creating user', err.message);
+    }
+  }
+
+  // return user  reference so that it can be used
+  return userRef;
+};
+
 firebase.initializeApp(config);
 
 export const auth = firebase.auth();

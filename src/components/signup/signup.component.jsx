@@ -18,17 +18,20 @@ class SignUp extends Component {
 
     const { displayName, email, password, confirmPassword } = this.state;
 
+    // if passwords don't match send alert to user
     if (password !== confirmPassword) {
       alert("passwords don't match");
       return;
     }
 
     try {
+      // try creating a user account
       const { user } = await auth.createUserWithEmailAndPassword(
         email,
         password
       );
 
+      // then create a profile document in our database
       await createUserProfileDocument(user, { displayName });
       this.setState({
         displayName: '',
@@ -43,7 +46,6 @@ class SignUp extends Component {
 
   handleChange = e => {
     const { name, value } = e.target;
-
     this.setState({ [name]: value });
   };
 
